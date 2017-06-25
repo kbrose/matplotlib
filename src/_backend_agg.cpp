@@ -51,6 +51,8 @@ RendererAgg::RendererAgg(unsigned int width, unsigned int height, double dpi)
 {
     unsigned stride(width * 4);
 
+    agg::fast_srand(1234);
+
     pixBuffer = new agg::int8u[NUMBYTES];
     renderingBuffer.attach(pixBuffer, width, height, stride);
     pixFmt.attach(renderingBuffer);

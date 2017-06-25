@@ -32,6 +32,7 @@
 #include <stdexcept>
 #include <string.h>
 #include <math.h>
+#include <iostream>
 #include "agg_math.h"
 #include "agg_array.h"
 
@@ -512,6 +513,18 @@ namespace agg
     };
 
 
+    static unsigned int g_seed;
+
+    inline void fast_srand( int seed ) {
+        g_seed = seed;
+    }
+
+    inline int fastrand() {
+        g_seed = (214013*g_seed+2531011);
+        return (g_seed>>16)&0x7FFF;
+    }
+
+
     //------------------------------------------------------------------------
     template<class Cell>
     void qsort_cells(Cell** start, unsigned num)
@@ -535,8 +548,8 @@ namespace agg
 
             if(len > qsort_threshold)
             {
-                // we use base + len/2 as the pivot
-                pivot = base + len / 2;
+                //NOPE!!!! we use base + len/2 as the pivot
+                pivot = base + (fastrand() % len); // len / 2;
                 swap_cells(base, pivot);
 
                 i = base + 1;
