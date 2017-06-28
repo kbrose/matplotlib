@@ -61,7 +61,7 @@ def test_noise():
     path = transform.transform_path(path)
     simplified = path.cleaned(simplify=True)
 
-    assert simplified.vertices.size == 25510
+    assert simplified.vertices.size == 25512
 
 
 def test_antiparallel_simplification():
@@ -138,13 +138,18 @@ def test_antiparallel_simplification():
                                [ 1. ,  0.5]],
                               simplified.vertices[:-2, :])
 
-@pytest.mark.parametrize('angle', [0, np.pi/4, np.pi/3,
-                                   np.pi/2, np.pi])
+# Only consider angles in 0 <= angle <= pi/2, otherwise
+# using min/max will get the expected results out of order:
+# min/max for simplification code depends on original vector,
+# and if angle is outside above range then simplification
+# min/max will be opposite from actual min/max.
+@pytest.mark.parametrize('angle', [0, np.pi/4, np.pi/3, np.pi/2])
 @pytest.mark.parametrize('offset', [0, .5])
 def test_angled_antiparallel(angle, offset):
     scale = 5
     np.random.seed(19680801)
     # get 15 random offsets
+    # TODO: guarantee offset > 0 results in some offsets < 0
     vert_offsets = (np.random.rand(15) - offset) * scale
     # always start at 0 so rotation makes sense
     vert_offsets[0] = 0
@@ -161,7 +166,7 @@ def test_angled_antiparallel(angle, offset):
     y_max = y[1:].max()
     y_min = y[1:].min()
 
-    if offset:
+    if offset > 0:
         p_expected = Path([[0, 0],
                            [x_max, y_max],
                            [x_min, y_min],
@@ -175,7 +180,6 @@ def test_angled_antiparallel(angle, offset):
                            [x[-1], y[-1]],
                            [0, 0]],
                           codes=[1, 2, 2, 0])
-
 
     p = Path(np.vstack([x, y]).T)
     p2 = p.cleaned(simplify=True)
@@ -197,7 +201,7 @@ def test_sine_plus_noise():
     path = transform.transform_path(path)
     simplified = path.cleaned(simplify=True)
 
-    assert simplified.vertices.size == 25238
+    assert simplified.vertices.size == 25240
 
 
 @image_comparison(baseline_images=['simplify_curve'], remove_text=True)

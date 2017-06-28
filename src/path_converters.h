@@ -666,6 +666,7 @@ class PathSimplifier : protected EmbeddedQueue<9>
                 m_lasty = *y;
                 m_moveto = false;
                 m_origdNorm2 = 0.0;
+                m_dnorm2BackwardMax = 0.0;
                 m_clipped = true;
                 if (queue_nonempty()) {
                     /* If we did a push, empty the queue now. */
@@ -702,9 +703,12 @@ class PathSimplifier : protected EmbeddedQueue<9>
                 m_dnorm2ForwardMax = m_origdNorm2;
                 m_dnorm2BackwardMax = 0.0;
                 m_lastForwardMax = true;
+                m_lastBackwardMax = false;
 
-                m_nextX = m_lastWrittenX = m_lastx = *x;
-                m_nextY = m_lastWrittenY = m_lasty = *y;
+                m_lastWrittenX = m_lastx;
+                m_lastWrittenY = m_lasty;
+                m_nextX = m_lastx = *x;
+                m_nextY = m_lasty = *y;
                 continue;
             }
 
@@ -785,6 +789,12 @@ class PathSimplifier : protected EmbeddedQueue<9>
                                                         : agg::path_cmd_line_to,
                            m_nextX,
                            m_nextY);
+                if (m_dnorm2BackwardMax > 0.0) {
+                    queue_push((m_moveto || m_after_moveto) ? agg::path_cmd_move_to
+                                                            : agg::path_cmd_line_to,
+                               m_nextBackwardX,
+                               m_nextBackwardY);
+                }
                 m_moveto = false;
             }
             queue_push((m_moveto || m_after_moveto) ? agg::path_cmd_move_to : agg::path_cmd_line_to,
