@@ -586,8 +586,9 @@ class PathSimplifier : protected EmbeddedQueue<9>
           m_nextBackwardX(0.0),
           m_nextBackwardY(0.0),
 
-          m_lastWrittenX(0.0),
-          m_lastWrittenY(0.0)
+          // start of the current vector that is begin simplified
+          m_currVecStartX(0.0),
+          m_currVecStartY(0.0)
     {
         // empty
     }
@@ -705,8 +706,8 @@ class PathSimplifier : protected EmbeddedQueue<9>
                 m_lastForwardMax = true;
                 m_lastBackwardMax = false;
 
-                m_lastWrittenX = m_lastx;
-                m_lastWrittenY = m_lasty;
+                m_currVecStartX = m_lastx;
+                m_currVecStartY = m_lasty;
                 m_nextX = m_lastx = *x;
                 m_nextY = m_lasty = *y;
                 continue;
@@ -724,8 +725,8 @@ class PathSimplifier : protected EmbeddedQueue<9>
                normalize o (by dividing the second term by o.o). */
 
             /* get the v vector */
-            double totdx = *x - m_lastWrittenX;
-            double totdy = *y - m_lastWrittenY;
+            double totdx = *x - m_currVecStartX;
+            double totdy = *y - m_currVecStartY;
             double totdot = m_origdx * totdx + m_origdy * totdy;
 
             /* get the para vector ( = (o.v)o/(o.o)) */
@@ -835,8 +836,8 @@ class PathSimplifier : protected EmbeddedQueue<9>
     double m_nextY;
     double m_nextBackwardX;
     double m_nextBackwardY;
-    double m_lastWrittenX;
-    double m_lastWrittenY;
+    double m_currVecStartX;
+    double m_currVecStartY;
 
     inline void _push(double *x, double *y)
     {
@@ -883,8 +884,8 @@ class PathSimplifier : protected EmbeddedQueue<9>
 
         m_dnorm2ForwardMax = m_origdNorm2;
         m_lastForwardMax = true;
-        m_lastWrittenX = m_queue[m_queue_write - 1].x;
-        m_lastWrittenY = m_queue[m_queue_write - 1].y;
+        m_currVecStartX = m_queue[m_queue_write - 1].x;
+        m_currVecStartY = m_queue[m_queue_write - 1].y;
         m_lastx = m_nextX = *x;
         m_lasty = m_nextY = *y;
         m_dnorm2BackwardMax = 0.0;
