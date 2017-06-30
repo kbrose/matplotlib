@@ -65,7 +65,7 @@ def test_noise():
 
 
 def test_antiparallel_simplification():
-    def _get_simplified(x,y):
+    def _get_simplified(x, y):
         fig, ax = plt.subplots()
         p1 = ax.plot(x, y)
 
@@ -77,66 +77,66 @@ def test_antiparallel_simplification():
 
         return simplified
 
-
     # test ending on a maximum
-    x = [ 0, 0,  0, 0,  0, 1]
-    y = [.5, 1, -1, 1,  2, .5]
+    x = [0, 0, 0, 0, 0, 1]
+    y = [.5, 1, -1, 1, 2, .5]
 
-    simplified = _get_simplified(x,y)
+    simplified = _get_simplified(x, y)
 
-    assert_array_almost_equal([[ 0. ,  0.5],
-                               [ 0. , -1. ],
-                               [ 0. ,  2. ],
-                               [ 1. ,  0.5]],
+    assert_array_almost_equal([[0., 0.5],
+                               [0., -1.],
+                               [0., 2.],
+                               [1., 0.5]],
                               simplified.vertices[:-2, :])
 
     # test ending on a minimum
-    x = [ 0, 0,  0, 0,  0, 1]
-    y = [.5, 1, -1, 1,  -2, .5]
+    x = [0, 0,  0, 0, 0, 1]
+    y = [.5, 1, -1, 1, -2, .5]
 
-    simplified = _get_simplified(x,y)
+    simplified = _get_simplified(x, y)
 
-    assert_array_almost_equal([[ 0. ,  0.5],
-                               [ 0. ,  1. ],
-                               [ 0. , -2. ],
-                               [ 1. ,  0.5]],
+    assert_array_almost_equal([[0., 0.5],
+                               [0., 1.],
+                               [0., -2.],
+                               [1., 0.5]],
                               simplified.vertices[:-2, :])
 
     # test ending in between
-    x = [ 0, 0,  0, 0,  0, 1]
-    y = [.5, 1, -1, 1,  0, .5]
+    x = [0, 0, 0, 0, 0, 1]
+    y = [.5, 1, -1, 1, 0, .5]
 
-    simplified = _get_simplified(x,y)
+    simplified = _get_simplified(x, y)
 
-    assert_array_almost_equal([[ 0. ,  0.5],
-                               [ 0. ,  1. ],
-                               [ 0. , -1. ],
-                               [ 0. ,  0. ],
-                               [ 1. ,  0.5]],
+    assert_array_almost_equal([[0., 0.5],
+                               [0., 1.],
+                               [0., -1.],
+                               [0., 0.],
+                               [1., 0.5]],
                               simplified.vertices[:-2, :])
 
     # test no anti-parallel ending at max
-    x = [ 0, 0,  0, 0,  0, 1]
-    y = [.5, 1,  2, 1,  3, .5]
+    x = [0, 0, 0, 0, 0, 1]
+    y = [.5, 1, 2, 1, 3, .5]
 
-    simplified = _get_simplified(x,y)
+    simplified = _get_simplified(x, y)
 
-    assert_array_almost_equal([[ 0. ,  0.5],
-                               [ 0. ,  3. ],
-                               [ 1. ,  0.5]],
+    assert_array_almost_equal([[0., 0.5],
+                               [0., 3.],
+                               [1., 0.5]],
                               simplified.vertices[:-2, :])
 
     # test no anti-parallel ending in middle
-    x = [ 0, 0,  0, 0,  0, 1]
-    y = [.5, 1,  2, 1,  1, .5]
+    x = [0, 0, 0, 0, 0, 1]
+    y = [.5, 1, 2, 1, 1, .5]
 
-    simplified = _get_simplified(x,y)
+    simplified = _get_simplified(x, y)
 
-    assert_array_almost_equal([[ 0. ,  0.5],
-                               [ 0. ,  2. ],
-                               [ 0. ,  1. ],
-                               [ 1. ,  0.5]],
+    assert_array_almost_equal([[0., 0.5],
+                               [0., 2.],
+                               [0., 1.],
+                               [1., 0.5]],
                               simplified.vertices[:-2, :])
+
 
 # Only consider angles in 0 <= angle <= pi/2, otherwise
 # using min/max will get the expected results out of order:
@@ -187,6 +187,7 @@ def test_angled_antiparallel(angle, offset):
     assert_array_almost_equal(p_expected.vertices,
                               p2.vertices)
     assert_array_equal(p_expected.codes, p2.codes)
+
 
 def test_sine_plus_noise():
     np.random.seed(0)
