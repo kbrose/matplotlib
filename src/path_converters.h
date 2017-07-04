@@ -562,31 +562,45 @@ class PathSimplifier : protected EmbeddedQueue<9>
           /* we square simplify_threshold so that we can compute
              norms without doing the square root every step. */
           m_simplify_threshold(simplify_threshold * simplify_threshold),
+
           m_moveto(true),
           m_after_moveto(false),
+          m_clipped(false),
+
+          // the x, y values from last iteration
           m_lastx(0.0),
           m_lasty(0.0),
-          m_clipped(false),
+
+          // the dx, dy comprising the original vector, used in conjunction
+          // with m_currVecStart* to define the original vector.
           m_origdx(0.0),
           m_origdy(0.0),
-          m_origdNorm2(0.0),
-          m_dnorm2ForwardMax(0.0), // maximum norm of vector in forward (parallel) direction
-          m_dnorm2BackwardMax(0.0), // maximum norm of vector in backward (anti-parallel)
-                                    // direction
-          m_lastForwardMax(false), // was last point furthest from
-                                   // lastWritten in forward (parallel) direction?
-          m_lastBackwardMax(false), // was last point furthest from
-                                    // lastWritten in backward (anti-parallel) direction?
 
-          // added to queue immediately when _push is called
+          // the squared norm of the original vector
+          m_origdNorm2(0.0),
+
+          // maximum squared norm of vector in forward (parallel) direction
+          m_dnorm2ForwardMax(0.0),
+          // maximum squared norm of vector in backward (anti-parallel) direction
+          m_dnorm2BackwardMax(0.0),
+
+          // was the last point the furthest from lastWritten in the
+          // forward (parallel) direction?
+          m_lastForwardMax(false),
+          // was the last point the furthest from lastWritten in the
+          // backward (anti-parallel) direction?
+          m_lastBackwardMax(false),
+
+          // added to queue when _push is called
           m_nextX(0.0),
           m_nextY(0.0),
 
-          // added to queue when _push is called if any backwards vectors were observed
+          // added to queue when _push is called if any backwards
+          // (anti-parallel) vectors were observed
           m_nextBackwardX(0.0),
           m_nextBackwardY(0.0),
 
-          // start of the current vector that is begin simplified
+          // start of the current vector that is being simplified
           m_currVecStartX(0.0),
           m_currVecStartY(0.0)
     {
@@ -721,12 +735,14 @@ class PathSimplifier : protected EmbeddedQueue<9>
                building is not too much. If o is the orig vector (we
                are building on), and v is the vector from the last
                written point to the current point, then the
-               perpendicular vector is p = v - (o.v)o, and we
-               normalize o (by dividing the second term by o.o). */
+               perpendicular vector is p = v - (o.v)o/(o.o)
+               (here, a.b indicates the dot product of a and b). */
 
             /* get the v vector */
             double totdx = *x - m_currVecStartX;
             double totdy = *y - m_currVecStartY;
+
+            /* get the dot product o.v */
             double totdot = m_origdx * totdx + m_origdy * totdy;
 
             /* get the para vector ( = (o.v)o/(o.o)) */
@@ -736,15 +752,19 @@ class PathSimplifier : protected EmbeddedQueue<9>
             /* get the perp vector ( = v - para) */
             double perpdx = totdx - paradx;
             double perpdy = totdy - parady;
+
+            /* get the squared norm of perp vector ( = p.p) */
             double perpdNorm2 = perpdx * perpdx + perpdy * perpdy;
 
-            /* If the perp vector is less than some number of (squared)
-               pixels in size, then merge the current vector */
+            /* If the perpendicular vector is less than
+               m_simplify_threshold pixels in size, then merge
+               current x,y with the current vector */
             if (perpdNorm2 < m_simplify_threshold) {
                 /* check if the current vector is parallel or
                    anti-parallel to the orig vector. In either case,
                    test if it is the longest of the vectors
-                   we are merging in that direction. */
+                   we are merging in that direction. If it is, then
+                   update the current vector in that direction. */
                 double paradNorm2 = paradx * paradx + parady * parady;
 
                 m_lastForwardMax = false;
