@@ -538,6 +538,28 @@ namespace agg
         base  = start;
         top   = stack;
 
+        int len = int(limit - base);
+        if(len > qsort_threshold)
+        {
+            Cell** curr;
+            curr = base;
+            bool sorted = true;
+            for (int i = 1; i < num; i++)
+            {
+                curr++;
+                if((*(curr - 1))->x > (*curr)->x)
+                {
+                    sorted = false;
+                    break;
+                }
+            }
+            if(sorted)
+            {
+                // std::cout << "here\n";
+                return;
+            }
+        }
+
         for (;;)
         {
             int len = int(limit - base);
@@ -548,8 +570,12 @@ namespace agg
 
             if(len > qsort_threshold)
             {
-                //NOPE!!!! we use base + len/2 as the pivot
-                pivot = base + (fastrand() % len); // len / 2;
+                // we use base + len/2 as the pivot
+                // pivot = base + len / 2;
+
+                // we use a random pivot
+                pivot = base + (fastrand() % len);
+
                 swap_cells(base, pivot);
 
                 i = base + 1;
